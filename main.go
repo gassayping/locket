@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/xml"
-	"io/fs"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -19,7 +19,7 @@ type Post struct {
 type Locket struct {
 	Template  *template.Template
 	Posts     string
-	PostsFile string
+	PostsFile os.File
 }
 
 func main() {
@@ -39,15 +39,15 @@ func FeedFromFile(tmpl, posts string) (Locket, error) {
 		return l, err
 	}
 	l.Template = t
-	f, err := os.ReadFile(posts)
-	if err == fs.ErrNotExist {
-		os.Create(posts)
-		f = []byte{}
-	} else if err != nil {
+	f, err := os.OpenFile(posts, os.O_RDWR|os.O_CREATE, os.FileMode(0o644))
+	if err != nil {
+		log.Fatalf("Could not open %v: %v", posts, err)
+	}
+	b, err := io.ReadAll(f)
+	if err != nil {
 		log.Fatal(err)
 	}
-	l.Posts = string(f)
-	l.PostsFile = posts
+	l.Posts = string(b)
 	return l, nil
 }
 
@@ -55,7 +55,7 @@ func (l *Locket) RequestAddPost(w http.ResponseWriter, r *http.Request) {
 	l.Posts += "<item>\n" +
 		r.FormValue("newItem") +
 		"\n</item>"
-	os.WriteFile(l.PostsFile, []byte(l.Posts), 0x664)
+	l.PostsFile.Write([]byte(l.Posts))
 }
 
 func (l *Locket) RequestFeed(w http.ResponseWriter, r *http.Request) {
