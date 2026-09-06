@@ -71,5 +71,6 @@ func (l *Locket) RequestFeed(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	w.Header().Add("Content-Type", "application/xml")
 	w.Write(b)
 }
