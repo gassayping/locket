@@ -65,9 +65,6 @@ func (l *Locket) RequestAddPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Locket) RequestFeed(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(l.Feed.Channel.SkipDays)
-	fmt.Println(l.Feed.Channel.Image)
-	fmt.Println(l.Feed.Channel.TextInput)
 	b, err := l.Feed.GetXML()
 	if err != nil {
 		log.Fatal(err)
