@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"locket/rss"
 	"log"
