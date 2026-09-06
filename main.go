@@ -33,9 +33,13 @@ func FeedFromFile(filePath string) Locket {
 	if err != nil {
 		log.Fatal(err)
 	}
-	l.Feed, err = rss.FeedFromXML(b)
-	if err != nil {
-		log.Fatalf("Error parsing feed from file %s: %s", filePath, err)
+	if len(b) == 0 {
+		l.Feed = rss.NewFeed()
+	} else {
+		l.Feed, err = rss.FeedFromXML(b)
+		if err != nil {
+			log.Fatalf("Error parsing feed from file %s: %s", filePath, err)
+		}
 	}
 	return l
 }
@@ -57,7 +61,6 @@ func (l *Locket) RequestAddPost(w http.ResponseWriter, r *http.Request) {
 	}
 	l.File.Truncate(0)
 	l.File.Seek(0, 0)
-	fmt.Println(string(b))
 	if _, err := l.File.Write(b); err != nil {
 		log.Fatal(err)
 	}
