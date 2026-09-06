@@ -30,24 +30,24 @@ type Channel struct {
 	Docs           string   `xml:"docs,omitempty"`
 	Cloud          string   `xml:"cloud,omitempty"`
 	Ttl            int      `xml:"ttl,omitempty"`
-	Image          struct {
-		Url   string `xml:"url,omitempty"`
-		Title string `xml:"title,omitempty"`
-		Link  string `xml:"link,omitempty"`
+	Image          *struct {
+		Url   string `xml:"url"`
+		Title string `xml:"title"`
+		Link  string `xml:"link"`
 
 		Width  int `xml:"width,omitempty"`
 		Height int `xml:"height,omitempty"`
 	} `xml:"image,omitempty"`
 
 	Rating    string `xml:"rating,omitempty"`
-	TextInput struct {
-		Title       string `xml:"title,omitempty"`
-		Description string `xml:"description,omitempty"`
-		Name        string `xml:"name,omitempty"`
-		Link        string `xml:"link,omitempty"`
+	TextInput *struct {
+		Title       string `xml:"title"`
+		Description string `xml:"description"`
+		Name        string `xml:"name"`
+		Link        string `xml:"link"`
 	} `xml:"textInput,omitempty"`
-	Hour     []int  `xml:"skipHours>hour,omitempty"`
-	SkipDays string `xml:"skipDays,omitempty"`
+	SkipHours *[]int `xml:"skipHours>hour,omitempty"`
+	SkipDays  string `xml:"skipDays,omitempty"`
 }
 
 type Item struct {
