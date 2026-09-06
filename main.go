@@ -1,56 +1,43 @@
 package main
 
 import (
-	"encoding/xml"
+	"fmt"
 	"io"
+	"locket/rss"
 	"log"
 	"net/http"
 	"os"
-	"text/template"
 )
 
-type Post struct {
-	XMLName   xml.Name `xml:"item"`
-	Title     string   `xml:"title"`
-	Link      string   `xml:"link"`
-	Published string   `xml:"pubDate"`
-}
-
 type Locket struct {
-	Template  *template.Template
-	Posts     string
-	PostsFile *os.File
+	Feed rss.RSS
+	File *os.File
 }
 
 func main() {
-	feed, err := FeedFromFile("./feed.tmpl", "./posts.xml")
-	if err != nil {
-		log.Fatal("Failed to read save file: ", err)
-	}
+	feed := FeedFromFile("./feed.xml")
 	http.HandleFunc("POST /add", feed.RequestAddPost)
 	http.HandleFunc("GET /feed.xml", feed.RequestFeed)
 	http.HandleFunc("GET /", feed.RequestHomePage)
 	log.Fatal(http.ListenAndServe(":7777", nil))
 }
 
-func FeedFromFile(tmpl, posts string) (Locket, error) {
+func FeedFromFile(filePath string) Locket {
 	var l Locket
-	t, err := template.ParseFiles(tmpl)
+	f, err := os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, os.FileMode(0o644))
 	if err != nil {
-		return l, err
+		log.Fatalf("Could not open %v: %v", filePath, err)
 	}
-	l.Template = t
-	f, err := os.OpenFile(posts, os.O_RDWR|os.O_CREATE, os.FileMode(0o644))
-	if err != nil {
-		log.Fatalf("Could not open %v: %v", posts, err)
-	}
+	l.File = f
 	b, err := io.ReadAll(f)
 	if err != nil {
 		log.Fatal(err)
 	}
-	l.Posts = string(b)
-	l.PostsFile = f
-	return l, nil
+	l.Feed, err = rss.FeedFromXML(b)
+	if err != nil {
+		log.Fatalf("Error parsing feed from file %s: %s", filePath, err)
+	}
+	return l
 }
 
 func (l Locket) RequestHomePage(w http.ResponseWriter, r *http.Request) {
@@ -63,16 +50,27 @@ func (l Locket) RequestHomePage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Locket) RequestAddPost(w http.ResponseWriter, r *http.Request) {
-	l.Posts += r.FormValue("newItem")
-	if _, err := l.PostsFile.Write([]byte(l.Posts)); err != nil {
+	l.Feed.AddItem([]byte(r.FormValue("newItem")))
+	b, err := l.Feed.GetXML()
+	if err != nil {
+		log.Fatal(err)
+	}
+	l.File.Truncate(0)
+	l.File.Seek(0, 0)
+	fmt.Println(string(b))
+	if _, err := l.File.Write(b); err != nil {
 		log.Fatal(err)
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
 
 func (l *Locket) RequestFeed(w http.ResponseWriter, r *http.Request) {
-	err := l.Template.Execute(w, l.Posts)
+	fmt.Println(l.Feed.Channel.SkipDays)
+	fmt.Println(l.Feed.Channel.Image)
+	fmt.Println(l.Feed.Channel.TextInput)
+	b, err := l.Feed.GetXML()
 	if err != nil {
 		log.Fatal(err)
 	}
+	w.Write(b)
 }
