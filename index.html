@@ -6,9 +6,39 @@
 		<title>Locket</title>
 	</head>
 	<body>
-		<form action="/add" method="post" target="_self">
-			<input type="text" name="newItem" value="<item></item>">
-			<button type="submit">Submit XML</button>
+		<script>
+		function submitXML(event) {
+			event.preventDefault();
+			const title = document.getElementById("title").value;
+			const link = document.getElementById("link").value;
+			const description = document.getElementById("description").value;
+
+			const item = "<item>" +
+			"<title>" + title + "</title>" +
+			"<link>" + link + "</link>" +
+			"<description>" + description + "</description>" +
+			"</item>"
+
+			try {
+				fetch(`/add?newItem=${item}`, {
+					method: "POST",
+				})
+			} catch(e) {
+				console.log(e)
+			}
+		}
+</script>
+		<!-- <form action="/add" method="post" target="_self"> -->
+		<form onsubmit="submitXML(event)">
+			<label>Title: <input type="text" id="title" /></label>
+			<br />
+			<label>Link: <input type="text" id="link" /></label>
+			<br />
+			<label>Description: <textarea id="description"></textarea>
+			</label>
+			<br />
+			<br />
+			<button type="submit">Publish</button>
 		</form>
 	</body>
 </html>

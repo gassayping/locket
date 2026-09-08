@@ -53,7 +53,12 @@ func (l Locket) RequestHomePage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (l *Locket) RequestAddPost(w http.ResponseWriter, r *http.Request) {
-	l.Feed.AddItem([]byte(r.FormValue("newItem")))
+	err := l.Feed.AddItem([]byte(r.FormValue("newItem")))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Malformed XML received: " + err.Error()))
+		return
+	}
 	b, err := l.Feed.GetXML()
 	if err != nil {
 		log.Fatal(err)
