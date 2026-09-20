@@ -6,29 +6,6 @@
 		<title>Locket</title>
 	</head>
 	<body>
-		<script>
-		function submitXML(event) {
-			event.preventDefault();
-			const title = document.getElementById("title").value;
-			const link = document.getElementById("link").value;
-			const description = document.getElementById("description").value;
-
-			const item = "<item>" +
-			"<title>" + title + "</title>" +
-			"<link>" + link + "</link>" +
-			"<description>" + description + "</description>" +
-			"</item>"
-
-			try {
-				fetch(`/add?newItem=${item}`, {
-					method: "POST",
-				})
-			} catch(e) {
-				console.log(e)
-			}
-		}
-</script>
-		<!-- <form action="/add" method="post" target="_self"> -->
 		<form onsubmit="submitXML(event)">
 			<label>Title: <input type="text" id="title" /></label>
 			<br />
@@ -40,5 +17,40 @@
 			<br />
 			<button type="submit">Publish</button>
 		</form>
+		<pre id="feed"></pre>
+		<script>
+		function submitXML(event) {
+			event.preventDefault();
+			const title = document.getElementById("title").value;
+			const link = document.getElementById("link").value;
+			const description = document.getElementById("description").value;
+			if (!(title || link || description)) {
+				return;
+			}
+
+			const item = "<item>" +
+			"<title>" + title + "</title>" +
+			"<link>" + link + "</link>" +
+			"<description>" + description + "</description>" +
+			"</item>"
+
+			try {
+				await fetch(`/add?newItem=${item}`, {
+					method: "POST",
+				})
+			} catch(e) {
+				console.log(e)
+			}
+			updateFeed();
+		}
+
+		async function updateFeed() {
+			const display = document.getElementById("feed");
+			const res = await fetch("/feed.xml");
+			const feedText = await res.text();
+			display.innerText = feedText;
+		}
+		updateFeed()
+		</script>
 	</body>
 </html>
