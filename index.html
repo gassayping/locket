@@ -6,18 +6,66 @@
 		<title>Locket</title>
 	</head>
 	<body>
-		<form onsubmit="submitXML(event)">
-			<label>Title: <input type="text" id="title" /></label>
-			<br />
-			<label>Link: <input type="text" id="link" /></label>
-			<br />
-			<label>Description: <textarea id="description"></textarea>
-			</label>
-			<br />
-			<br />
-			<button type="submit">Publish</button>
-		</form>
-		<pre id="feed"></pre>
+		<style>
+		body {
+			padding-top: 2vh;
+		}
+		input, textarea {
+			margin-top: 5px;
+			border: none;
+			min-height: 1.75em;
+			min-width: 90%;
+			display: flex;
+			background-color: #444;
+			color: #EEFEEE;
+		}
+		textarea {
+			min-height: 10em;
+		}
+		.container > pre {
+			tab-size: 4;
+			white-space: pre-wrap;
+			min-width: 80em;
+		}
+		form {
+			justify-content:space-between;
+		}
+		form > * {
+			margin-bottom: 1vh;
+		}
+		@media (prefers-color-scheme: dark) {
+			:root {
+				background-color: #333333;
+				color: #EEFEEE;
+			}
+			button {
+				background-color: #333333;
+				color: #EEFEEE;
+			}
+		}
+		@media screen and (min-width: 100vh) {
+			.container {
+				display: flex;
+			}
+			.container > form {
+				min-width: 40vw;
+			}
+		}
+		</style>
+		<div class="container">
+			<form onsubmit="submitXML(event)">
+				<label>Title: <input type="text" id="title" /></label>
+				<br />
+				<label>Link: <input type="text" id="link" /></label>
+				<br />
+				<label>Description: <textarea id="description"></textarea>
+				</label>
+				<br />
+				<br />
+				<button type="submit">Publish</button>
+			</form>
+			<pre id="feed"></pre>
+		<div/>
 		<script>
 		async function submitXML(event) {
 			event.preventDefault();
