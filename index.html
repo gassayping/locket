@@ -16,8 +16,6 @@
 			min-height: 1.75em;
 			min-width: 90%;
 			display: flex;
-			background-color: #444;
-			color: #EEFEEE;
 		}
 		textarea {
 			min-height: 10em;
@@ -33,6 +31,20 @@
 		form > * {
 			margin-bottom: 1vh;
 		}
+		@media (prefers-color-scheme: light) {
+			:root {
+				background-color: #DDD;
+				color: #333;
+			}
+			button {
+				background-color: #DDD;
+				color: #333;
+			}
+			input, textarea {
+				background-color: #E8E8E8;
+				color: #444;
+			}
+		}
 		@media (prefers-color-scheme: dark) {
 			:root {
 				background-color: #333333;
@@ -40,6 +52,10 @@
 			}
 			button {
 				background-color: #333333;
+				color: #EEFEEE;
+			}
+			input, textarea {
+				background-color: #444;
 				color: #EEFEEE;
 			}
 		}
